@@ -1,439 +1,447 @@
-//=HIGH PRIORITY=
-//rate my waifu and make integral bias work 
-//gay rating ✓ 
-//make the !roast x work ✓
-//confliction between the dadbot code and the sarcasmify command
-//make the copypasta work
-//=LOW PRIORITY=
-//get the bloody reddit api to work
-//fix $client.user.tag ✓ 
-//get !ping to work
-//===========================================
 
-const Discord = require("discord.js");
-console.log("Loaded discord JS API");
-const client = new Discord.Client();
-console.log("Created new Client");
-const fs = require("fs");
-console.log("File Loading module loaded");
-const randomWords = require("random-words");
-console.log("Random word module loaded");
-const snoowrap = require("snoowrap");
-console.log("Reddit API loaded");
-const snoostorm = require("snoostorm");
-console.log("Reddit comments API loaded")
-const config = require("./JSON/config/config.json");
-console.log("Config loaded");
-require("dotenv").config();
-console.log("Dotenv for reddit loaded");
+const fs = require("fs")
 
-
-var count = 0;
-var selectInt = null;
-var args = null;
-var suffix = "ion";
-var randomWord = randomWords();
-
-function booleanBiasWithWaifu(args, msg, authorId) {
-    var rateMyWaifu = args[0];
-    var numberSelected = Math.floor((Math.random() * 10)) + 1;
-    try {
-        if (authorId == 414066677727232001) {
-            numberSelected = Math.floor((Math.random() * 10)) + 5;
-            var booleanBias = Math.floor((Math.random() * 3)) + 1;
-            if (booleanBias == 2) {
-                return numberSelected;
-            }
-            else {
-                null;
-            }
-        }
-        else if (authorId == 474629080390565899) {
-            numberSelected = Math.floor((Math.random() * 5)) + 1;
-            var booleanBias = Math.floor((Math.random() * 6)) + 1;
-            if (booleanBias == 2) {
-                return numberSelected;
-            }
-            else {
-                null;
-            }
-        }
-    }
-    catch (err) {
-        console.log(err);
-    }
-    return numberSelected;
-
-};
-
-function suffixChecker(msg, suffix) {
-    if ((msg == "") || (msg == null)) {
-        return false;
-    }
-    else {
-        msg = msg.toString();
-        suffix = suffix.toString()
-        return msg.indexOf(suffix, msg.length - suffix.length) !== -1;
-    };
-};
-
-function jsonSearch(path, msgInt, count, multiLineSpecial) { //Finds, and spews out the looked up JSON thing, via user selection or RNG
-    var number = msgInt;
-    console.log("NUMBER:")
-    console.log(number);
-
-    if (isNaN(msgInt)) { //if msgint isnot number throw a hissy fit
-        console.log("l")
-        console.log(msgInt);
-        var number = Math.floor((Math.random() * count)) + 1;
-    }
-
-    if (config.debug == true) {
-        console.log("==DEBUG==")
-        console.log("path: ", path);
-        console.log("path typeof", typeof path)
-        console.log("msgInt: ", msgInt)
-        console.log("path msgInt", typeof msgInt)
-        console.log("count: ", count)
-        console.log("path count", typeof count)
-        console.log("number: ", number)
-        console.log("path number", typeof number)
-        console.log("multiLineSpecial: ", multiLineSpecial)
-        console.log("path multiLineSpecial", typeof multiLineSpecial)
-        console.log("==END DEBUG==");
-
-    };
-    
-    var number = number.toString();
-
-    var rawJSON = fs.readFileSync(path);
-    var validJSON = JSON.parse(rawJSON);
-
-
-    if (multiLineSpecial != undefined) {
-        for (i = 0; i <= multiLineSpecial.length; i++) {
-            //console.log(multiLineSpecial[i]);
-            let temp = multiLineSpecial[i];
-
-            if (number == temp) {
-                console.log("Match!")
-                try {
-                    specialCopypastaParse = validJSON["Special Copypastas"]
-                    console.log(temp);
-
-                }
-                catch (err) {
-                    console.log(err);
-                }
-                console.log(specialCopypastaParse);
-            }
-        }
-    };
-
-    var selectJSON = validJSON[number];
-    console.log(selectJSON);
-    return selectJSON;
-}
-
-console.log("#########")
-console.log(config.CLIENT_ID);
-console.log(config.CLIENT_SECRET);
-console.log(config.REDDIT_PASS);
-console.log(config.REDDIT_USER);
-console.log("#########")
-
-
-const r = new snoowrap({ //login for reddit
-    userAgent: "reddit-bot-example-node",
-    clientId: config.CLIENT_ID,
-    clientSecret: config.CLIENT_SECRET,
-    username: config.REDDIT_USER,
-    password: config.REDDIT_PASS
-});
-
-const redditClient = new snoowrap(r);
-console.log ("Reddit Client Logged in and Initialized")
-
-
-
-console.log("=======");
-console.log(randomWord);
-console.log("=======");
 
 try {
+    const Discord = require("discord.js");
+    console.log("Loaded discord JS API");
+    const client = new Discord.Client();
+    console.log("Created new Client");
+    const fs = require("fs");
+    console.log("File Loading module loaded");
+    const date = new Date();
+    console.log("Date module loaded");
+    const randomWords = require("random-words");
+    console.log("Random word module loaded");
+    const snoowrap = require("snoowrap");
+    console.log("Reddit API loaded");
+    const snoostorm = require("snoostorm");
+    console.log("Reddit comments API loaded")
+    const config = require("./JSON/config/config.json");
+    console.log("Config loaded");
+    require("dotenv").config();
+    console.log("Dotenv for reddit loaded");
 
-    client.on("ready", () => {
-        console.log(`Logged in as ${client.user.tag}!`);
-        client.user.setActivity("people like a damn fiddle", { TYPE: "PLAYING" });
-    });
-
-    client.on("message", msg => {
-        console.log(msg.author.id);
-
-        var authorId = msg.author.id;
-        if (msg.author.id != 451895471305392138) {
-
-            var tarnationChecker = suffixChecker(msg, suffix);
+    var count = 0;
+    var selectInt = null;
+    var args = null;
+    var suffix = "ion";
+    var randomWord = randomWords(); 
 
 
-            if (tarnationChecker == true) {
-                console.log("wot in tarnation"); //checks in console 
-                var goForTarnation = true;
-            }
-
-            else { };
-
-            var args = msg.content.slice("!").trim().split(/ +/g);
-
-            console.log(args);
-            console.log(args[0]);
-
-            var argsLength = args.length;
-
-            for (var i = 0; i < argsLength; i++) {
-                temp = args[i];
-                if (temp == "im" || temp == "i'm" || temp == "I'm" || temp == "I'M") {
-                    console.log(dadTrigger);
-                    var dadTrigger = true;
-                    var j = i + 1
-                    var afterTrigger = args.splice(j);
-                    var afterTrigger = afterTrigger.join(" ")
-                }
-
-                if (temp == "comedy" || temp == "comedgy") {
-                    let number = Math.floor((Math.random() * 3)) + 1;
-                    if (number == 3) {
-                        msg.channel.send("http://bit.ly/2LzpUdE")
-                    }
-                }
-
-                if (temp == randomWord) {
-                    client.user.setActivity("10 hours of ali-a", { TYPE: "WATCHING" });
-                    msg.channel.send("Changing status on discord");
-                };
-
-                if (goForTarnation == true) {
-                    console.log("We are a go for tarnationism");
-                    let msg = temp;
-                    console.log("owo")
-                    var tempArrForRedditQuery = [];
-                    tempArrForRedditQuery.push(msg);
-                    console.log(tempArrForRedditQuery);
-                    console.log(msg);
-                    if (temp == "in") { //contributes to see how long the string is, if this was google then we would be able to do more than 3 but im scared of reddits search
-                        var numberInArr = i;
-                        console.log(i);
-                    }
-                    let wordTarnationCheck = suffixChecker(msg, suffix);
-                    if (wordTarnationCheck == true) {
-                        console.log("=====================")
-                        console.log(msg);
-                        console.log("=====================")
-                        var checkNumInArr = i;
-                    }
-                };
-            }
-
-            var sumOfNumbers = checkNumInArr - numberInArr;
-            console.log(sumOfNumbers);
-            if (sumOfNumbers <= 3 && sumOfNumbers > 0) {
-                console.log("Requesting reddit api to get its act together");
-                try {
-                    console.log(tempArrForRedditQuery);
-                }
-                catch (err) {
-                    console.log(err);
-                }
-                //console.log(r.getSubreddit("whatintarnation").search({ query: "tarnation", sort: "year" }).then(console.log));
-            }
-
-            var number = Math.floor((Math.random() * 8)) + 1; // we dont want consistent dad jokes, make it 1-5 EDIT: 1-8- AS IT TRIGGERS TOO MUCH WHEN THE CHANCES ARE 1-5 WHO'D A THOUGHT 
-            console.log(number);
-            if (number == 5 && dadTrigger == true) {
-                msg.channel.send("Hi " + afterTrigger + ", I'm dad!");
-                var dadTrigger = false;
-
-            }
-            else if (number < 5 && dadTrigger == true) {
-                console.log("Potential dad joke avoided, we'll get 'em next time");
-            }
-            else {
-                null;
-            };
-
-            var authorID = msg.author.id;
-
-            var message = args.shift().toLowerCase(); // user sanitization
-
-            if (args[0] !== null) { //Try to convert user input into int
-                var selectInt = args[0];
-                var msgInt = parseInt(selectInt, 10); //Cast it as an int. Well, attempt.
-                //console.log(msgInt);
-            }
-            else if (args[0] == null) {
-                var msgInt = null;
-            };
-
-            if (msg.content.startsWith(config.prefix + "discordmeme")) {
-                var path = "./JSON/discord memes.json";
-                var count = config.memeCount;
-                msg.channel.send(jsonSearch(path, msgInt, count));
-            }
-
-            if (msg.content.startsWith(config.prefix + "artwork")) {
-                var path = "./JSON/artwork.json";
-                var count = config.artworkCount
-                msg.channel.send(jsonSearch(path, msgInt, count));
-            }
-
-            if (msg.content.startsWith(config.prefix + "copypasta")) {
-                var path = "./JSON/copypasta.json";
-                var count = config.copypastaCount;
-                var multiLineSpecial = ["13", "14", "15"];
-                msg.channel.send(jsonSearch(path, msgInt, count, multiLineSpecial));
-            }
-
-            if (msg.content.startsWith(config.prefix + "brainlet")) {
-                var path = "./JSON/brainlet.json";
-                var count = config.brainletCount;
-                msg.channel.send(jsonSearch(path, msgInt, count));
-            };
-
-            if (msg.content.startsWith(config.prefix + "fino")) {
-                var path = "./JSON/fino.json";
-                var count = config.finoCount;
-                msg.channel.send(jsonSearch(path, msgInt, count));
-            };
-
-            if (message === "!beef") {
-                msg.channel.send("https://goo.gl/9TxrJi");
-            }
-
-            if (msg.content.startsWith(config.prefix + "roast")) {
-                var path = "./JSON/roasts.json";
-                var count = config.roastCount;
-                roast = jsonSearch(path, NaN, count);
-                if (args[0] === undefined) {
-                    var path = "./JSON/users.json";
-                    var count = config.userCount;
-                    var userRoast = jsonSearch(path, NaN, count);
-                    console.log(userRoast);
-                    msg.channel.send(roast + userRoast);
+    function booleanBiasWithWaifu(args, msg, authorId) {
+        var rateMyWaifu = args[0];
+        var numberSelected = Math.floor((Math.random() * 10)) + 1;
+        try {
+            if (authorId == 414066677727232001) {
+                numberSelected = Math.floor((Math.random() * 10)) + 5;
+                var booleanBias = Math.floor((Math.random() * 3)) + 1;
+                if (booleanBias == 2) {
+                    return numberSelected;
                 }
                 else {
-                    let userRoast = msg.mentions.users.first();
-                    userRoast = "<@" + userRoast.id + ">";
-                    console.log("====")
-                    console.log(userRoast);
-                    console.log("===")
-                    msg.channel.send(roast + userRoast);
-                    if (userRoast === undefined) {
-
-                        return null;
-                    }
+                    null;
                 }
-            };
-
-            if (message === "!f") {
-                msg.channel.send("https://bit.ly/2JErKGw");
             }
+            else if (authorId == 474629080390565899) {
+                numberSelected = Math.floor((Math.random() * 5)) + 1;
+                var booleanBias = Math.floor((Math.random() * 6)) + 1;
+                if (booleanBias == 2) {
+                    return numberSelected;
+                }
+                else {
+                    null;
+                }
+            }
+        }
+        catch (err) {
+            console.log(err);
+        }
+        return numberSelected;
 
-            if (message === "!owo") {
-                msg.channel.send("Stop this please");
-            };
+    };
+
+    function suffixChecker(msg, suffix) {
+        if ((msg == "") || (msg == null)) {
+            return false;
+        }
+        else {
+            msg = msg.toString();
+            suffix = suffix.toString()
+            return msg.indexOf(suffix, msg.length - suffix.length) !== -1;
+        };
+    };
+
+    function jsonSearch(path, msgInt, multiLineSpecial) { //Finds, and spews out the looked up JSON thing, via user selection or RNG
+        var number = msgInt;
+        var rawJSON = fs.readFileSync(path);
+        var validJSON = JSON.parse(rawJSON);
+
+        let count = Object.keys(validJSON).length;
+        console.log("NUMBER:")
+        console.log(number);
+
+        if (isNaN(msgInt)) { //if msgint isnot number throw a hissy fit
+            console.log("l")
+            console.log(msgInt);
+            var number = Math.floor((Math.random() * count)) + 1;
+        }
+
+        if (config.debug == true) {
+            console.log("==DEBUG==")
+            console.log("path: ", path);
+            console.log("path typeof", typeof path)
+            console.log("msgInt: ", msgInt)
+            console.log("path msgInt", typeof msgInt)
+            console.log("count: ", count)
+            console.log("path count", typeof count)
+            console.log("number: ", number)
+            console.log("path number", typeof number)
+            console.log("multiLineSpecial: ", multiLineSpecial)
+            console.log("path multiLineSpecial", typeof multiLineSpecial)
+            console.log("==END DEBUG==");
+
+        };
+
+        var number = number.toString();
+
+        if (multiLineSpecial != undefined) {
+            for (i = 0; i <= multiLineSpecial.length; i++) {
+                console.log(multiLineSpecial[i]);
+                let temp = multiLineSpecial[i];
+
+                if (number == temp) {
+                    console.log("Match!")
+                    try {
+                        specialCopypastaParse = validJSON["Special Copypastas"].number;
+                        console.log(temp);
+
+                    }
+                    catch (err) {
+                        console.log(err);
+                    }
+                    console.log(specialCopypastaParse);
+                }
+            }
+        };
+
+        var selectJSON = validJSON[number];
+        console.log(selectJSON); //HELLO FLAG REMOVE BEFORE COMPILING
+        return selectJSON;
 
 
-            if (message === "!#logoutprotocol" && msg.author.id == 414066677727232001) {
-                console.log("Logging out...");
-                client.destroy();
-            };
+    } 
+ 
 
-            if (msg.content.startsWith(config.prefix + "help")) {
-                msg.channel.send("!discordmeme - Shows a random meme that has been made over the ages. \n\
+    if (config.debug == true) {
+        console.log("#########")
+        console.log(config.CLIENT_ID);
+        console.log(config.CLIENT_SECRET);
+        console.log(config.REDDIT_PASS);
+        console.log(config.REDDIT_USER);
+        console.log("#########");
+    }
+
+
+    const r = new snoowrap({ //login for reddit
+        userAgent: "reddit-bot-example-node",
+        clientId: config.CLIENT_ID,
+        clientSecret: config.CLIENT_SECRET,
+        username: config.REDDIT_USER,
+        password: config.REDDIT_PASS
+    });
+
+    const redditClient = new snoowrap(r);
+    console.log("Reddit Client Logged in and Initialized")
+
+
+
+    console.log("=======");
+    console.log(randomWord);
+    console.log("=======");
+
+    try {
+
+        client.on("ready", () => {
+            console.log(`Logged in as ${client.user.tag}!`);
+            client.user.setActivity("people like a damn fiddle", { TYPE: "PLAYING" });
+        });
+
+        client.on("message", msg => {
+            console.log(msg.author.id);
+
+            var authorId = msg.author.id;
+            if (msg.author.id != 451895471305392138) {
+
+                var tarnationChecker = suffixChecker(msg, suffix);
+
+
+                if (tarnationChecker == true) {
+                    console.log("wot in tarnation"); //checks in console 
+                    var goForTarnation = true;
+                }
+
+                else {};
+
+                var args = msg.content.slice("!").trim().split(/ +/g);
+
+                console.log(args);
+                console.log(args[0]);
+
+                var argsLength = args.length;
+
+                for (var i = 0; i < argsLength; i++) { //iterates thru arr to check for shit
+                    temp = args[i];
+                    if (temp == "im" || temp == "i'm" || temp == "I'm" || temp == "I'M") {
+                        console.log(dadTrigger);
+                        var dadTrigger = true;
+                        var j = i + 1
+                        var afterTrigger = args.splice(j);
+                        afterTrigger = afterTrigger.join(" ")
+                    }
+
+                    if (temp == "comedy" || temp == "comedgy") {
+                        let number = Math.floor((Math.random() * 3)) + 1;
+                        if (number == 3) {
+                            msg.channel.send("http://bit.ly/2LzpUdE")
+                        }
+                    }
+
+                    if (temp == randomWord) {
+                        client.user.setActivity("10 hours of ali-a", { TYPE: "WATCHING" });
+                        msg.channel.send("Changing status on discord");
+                    };
+
+                    if (goForTarnation == true) {
+                        console.log("We are a go for tarnationism");
+                        let msg = temp;
+                        console.log("owo")
+                        var tempArrForRedditQuery = [];
+                        tempArrForRedditQuery.push(msg);
+                        console.log(tempArrForRedditQuery);
+                        console.log(msg);
+                        if (temp == "in") { //contributes to see how long the string is, if this was google then we would be able to do more than 3 but im scared of reddits search
+                            var numberInArr = i;
+                            console.log(i);
+                        }
+                        let wordTarnationCheck = suffixChecker(msg, suffix);
+                        if (wordTarnationCheck == true) {
+                            console.log("=====================")
+                            console.log(msg);
+                            console.log("=====================")
+                            var checkNumInArr = i;
+                        }
+                    };
+                }
+
+                var sumOfNumbers = checkNumInArr - numberInArr;
+                console.log(sumOfNumbers);
+                if (sumOfNumbers <= 3 && sumOfNumbers > 0) {
+                    console.log("Requesting reddit api to get its act together");
+                    try {
+                        console.log(tempArrForRedditQuery);
+                    }
+                    catch (err) {
+                        console.log(err);
+                    }
+                    //console.log(r.getSubreddit("whatintarnation").search({ query: "tarnation", sort: "year" }).then(console.log));
+                }
+
+                var number = Math.floor((Math.random() * 8)) + 1; // we dont want consistent dad jokes, make it 1-5 EDIT: 1-8- AS IT TRIGGERS TOO MUCH WHEN THE CHANCES ARE 1-5 WHO'D A THOUGHT 
+                console.log(number);
+                if (number == 5 && dadTrigger == true) {
+                    msg.channel.send("Hi " + afterTrigger + ", I'm dad!");
+                    var dadTrigger = false;
+
+                }
+                else if (number < 5 && dadTrigger == true) {
+                    console.log("Potential dad joke avoided, we'll get 'em next time");
+                }
+                else {
+                    null;
+                };
+
+                var authorID = msg.author.id;
+
+                var message = args.shift().toLowerCase(); // user sanitization
+
+                if (args[0] !== null) { //Try to convert user input into int
+                    var selectInt = args[0];
+                    var msgInt = parseInt(selectInt, 10); //Cast it as an int. Well, attempt.
+                    //console.log(msgInt);
+                }
+                else if (args[0] == null) {
+                    var msgInt = null;
+                };
+
+                if (msg.content.startsWith(config.prefix + "discordmeme")) {
+                    var path = "./JSON/discord memes.json";
+                    msg.channel.send(jsonSearch(path, msgInt));
+                }
+
+                if (msg.content.startsWith(config.prefix + "artwork")) {
+                    var path = "./JSON/artwork.json";
+                    msg.channel.send(jsonSearch(path, msgInt));
+                }
+
+                if (msg.content.startsWith(config.prefix + "copypasta")) {
+                    var path = "./JSON/copypasta.json";
+                    var multiLineSpecial = ["13", "14", "15"];
+                    msg.channel.send(jsonSearch(path, msgInt,  multiLineSpecial));
+                }
+
+                if (msg.content.startsWith(config.prefix + "brainlet")) {
+                    var path = "./JSON/brainlet.json";
+                    msg.channel.send(jsonSearch(path, msgInt));
+                };
+
+                if (msg.content.startsWith(config.prefix + "fino")) {
+                    var path = "./JSON/fino.json";
+                    msg.channel.send(jsonSearch(path, msgInt));
+                };
+
+                if (message === "!beef") {
+                    msg.channel.send("https://goo.gl/9TxrJi");
+                }
+
+                if (msg.content.startsWith(config.prefix + "roast")) {
+                    var path = "./JSON/roasts.json";
+                    roast = jsonSearch(path, NaN);
+                    if (args[0] === undefined) {
+                        var path = "./JSON/users.json";
+                        var userRoast = jsonSearch(path, NaN);
+                        console.log(userRoast);
+                        msg.channel.send(roast + userRoast);
+                    }
+                    else {
+                        let userRoast = msg.mentions.users.first();
+                        userRoast = "<@" + userRoast.id + ">";
+                        console.log("====")
+                        console.log(userRoast);
+                        console.log("===")
+                        msg.channel.send(roast + userRoast);
+                        if (userRoast === undefined) {
+
+                            return null;
+                        }
+                    }
+                };
+
+                if (message === "!f") {
+                    msg.channel.send("https://bit.ly/2JErKGw");
+                }
+
+                if (message === "!#logoutprotocol" && msg.author.id == 414066677727232001) {
+                    console.log("Logging out...");
+                    client.destroy();
+                };
+
+                if (msg.content.startsWith(config.prefix + "help")) {
+                    msg.channel.send("!discordmeme - Shows a random meme that has been made over the ages. \n\
     !copypasta - Shows a random copypasta from a limited catalogue.\n\
     !f - Press f to pay respects.\n\
     !roast - Roasts either a user of your choice or a random user. Great for getting someones attention.\n\
-    !ping - Returns pong. Should display the latency too.\n\
+    !ping - Returns pong. ***Should*** display the latency too.\n\
     !beef - When people have a bit o' beef between one another\n\
     !artwork - Displays beautiful artwork made throughout the ages\n\
     !fino - Displays a beautiful fino platter face\n\
     !sarcasmify - With required text after the command, returns the text, but sarcasticially.\n\
     !ratemywaifu - Does what it says.\n\
-    !howgayis - Uses coding and algorithms to calculate how gay someone is \n")                
-      
-            };
+    !howgayis - Uses coding and algorithms to calculate how gay someone is \n")
 
-            if (msg.content.startsWith(config.prefix + "8ball")) {
-                var path = "./JSON/eightball.json";
-                var number = Math.floor((Math.random() * config.eightBallCount)) + 1;
-                var eightBallPrediction = jsonSearch(path, count, number);
-                const dsedabEmoji = client.emojis.find("name", "dsedab");
-                authorID = "<@" + authorID + ">";
-                msg.channel.send(dsedabEmoji + " | " + eightBallPrediction + authorID);
-            }
-
-            if (msg.content.startsWith(config.prefix + "sarcasmify")) {
-                var temp = args.join(' ');
-                var individualCharMessage = temp.split('');
-                console.log(individualCharMessage);
-                var charMessageLength = individualCharMessage.length;
-
-                for (i = 0; i < charMessageLength; i++) {
-                    var charManipulate = individualCharMessage[i];
-                    var number = Math.floor((Math.random() * 2)) + 1;
-                    console.log(number);
-                    if (number == 2) {
-                        individualCharMessage[i] = charManipulate.replace(charManipulate, charManipulate.toUpperCase());
-                    }
-                    else {
-                        individualCharMessage[i] = charManipulate.replace(charManipulate, charManipulate.toLowerCase());
-                    }
                 };
 
-                console.log(individualCharMessage);
-                individualCharMessage = individualCharMessage.join("");
-                msg.channel.send(individualCharMessage);
+                if (msg.content.startsWith(config.prefix + "8ball")) {
+                    var path = "./JSON/eightball.json";
+                    var number = Math.floor((Math.random() * config.eightBallCount)) + 1;
+                    var eightBallPrediction = jsonSearch(path, count, number);
+                    const dsedabEmoji = client.emojis.find("name", "dsedab");
+                    authorID = "<@" + authorID + ">";
+                    msg.channel.send(dsedabEmoji + " | " + eightBallPrediction + authorID);
+                }
 
+                if (msg.content.startsWith(config.prefix + "sarcasmify")) {
+                    var temp = args.join(' ');
+                    var individualCharMessage = temp.split('');
+                    console.log(individualCharMessage);
+                    var charMessageLength = individualCharMessage.length;
+
+                    for (i = 0; i < charMessageLength; i++) {
+                        var charManipulate = individualCharMessage[i];
+                        var number = Math.floor((Math.random() * 2)) + 1;
+                        console.log(number);
+                        if (number == 2) {
+                            individualCharMessage[i] = charManipulate.replace(charManipulate, charManipulate.toUpperCase());
+                        }
+                        else {
+                            individualCharMessage[i] = charManipulate.replace(charManipulate, charManipulate.toLowerCase());
+                        }
+                    };
+
+                    console.log(individualCharMessage);
+                    individualCharMessage = individualCharMessage.join("");
+                    msg.channel.send(individualCharMessage);
+
+                }
+
+                if (msg.content.startsWith(config.prefix + "ping")) {
+                    var waitForResponse = msg.channel.send("Ping?").then((msg) => {
+                        console.log(waitForResponse.createdTimestamp)
+                        try {
+                            msg.edit(`Pong! API latency is ${Math.round(client.ping)}ms. `)
+                        }
+                        catch (err) {
+                            console.log(err);
+                        }
+                    });
+                };
+
+                if (msg.content.startsWith(config.prefix + "ratemywaifu")) {
+                    console.log("==")
+                    console.log(booleanBiasWithWaifu(args, msg, authorId));
+                    console.log("==")
+                };
+
+                if (msg.content.startsWith(config.prefix + "howgayis")) {
+                    var personToRate = args[0];
+                    console.log(personToRate);
+                    var number = Math.floor((Math.random() * 100)) + 1;
+                    console.log(number);
+                    let temp = personToRate + " is " + number.toString() + "% gay. " + ":gay_pride_flag:";
+                    console.log(temp);
+                    msg.channel.send(temp);
+
+
+                };
+
+              
             }
+            else { };
+        })
+    }
 
-            if (msg.content.startsWith(config.prefix + "ping")) {
-                var waitForResponse = msg.channel.send("Ping?");
-                try {
-                    msg.edit(`Pong! Latency is ${waitForResponse.createdTimestamp - msg.createdTimestamp}ms. API latency is ${Math.round(client.ping)}ms. `)
-                }
-                catch (err) {
-                    console.log(err);
-                }
-            };
+    catch (err) {
+        console.log(err);
+    }
 
-            if (msg.content.startsWith(config.prefix + "ratemywaifu")) {
-                console.log("==")
-                console.log(booleanBiasWithWaifu(args, msg, authorId));
-                console.log("==")
-            };
-
-            if (msg.content.startsWith(config.prefix + "howgayis")) {
-                var personToRate = args[0];
-                console.log(personToRate);
-                var number = Math.floor((Math.random() * 100)) + 1;
-                console.log(number);
-                let temp = personToRate + " is " + number.toString() + "% gay. " + ":gay_pride_flag:";
-                console.log(temp);
-                msg.channel.send(temp);
-                
-
-            };
-
-
-            //wot in tarnation
-
-        }
-        else { };
-    })
+    client.login(config.token);
 }
 
 catch (err) {
-    console.log(err);
-}
 
-client.login(config.token);
+    console.log(err);
+    var errorGen = err;
+    console.log(Date(0));
+
+    filename = new Date().getTime() + ".txt";
+
+    console.log(filename);
+    console.log("==")
+    console.log(errorGen);
+
+    fs.writeFile(filename, errorGen, function (err) {
+        if (err) throw err;
+        console.log("File created");
+    });
+
+};
