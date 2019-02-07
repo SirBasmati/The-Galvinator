@@ -14,11 +14,21 @@ try {
     const randomWords = require("random-words");
     console.log("Random word module loaded");
     const snoowrap = require("snoowrap");
+
     console.log("Reddit API loaded");
     const snoostorm = require("snoostorm");
     console.log("Reddit comments API loaded")
     const config = require("./JSON/config/config.json");
     console.log("Config loaded");
+    const readline = require("readline");
+
+    var rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    console.log("Readline module loaded")
+
     require("dotenv").config();
     console.log("Dotenv for reddit loaded");
 
@@ -316,9 +326,9 @@ try {
                     else {
                         let userRoast = msg.mentions.users.first();
                         userRoast = "<@" + userRoast.id + ">";
-                        console.log("====")
+                        console.log("====");
                         console.log(userRoast);
-                        console.log("===")
+                        console.log("===");
                         msg.channel.send(roast + userRoast);
                         if (userRoast === undefined) {
 
@@ -338,16 +348,16 @@ try {
 
                 if (msg.content.startsWith(config.prefix + "help")) {
                     msg.channel.send("!discordmeme - Shows a random meme that has been made over the ages. \n\
-    !copypasta - Shows a random copypasta from a limited catalogue.\n\
-    !f - Press f to pay respects.\n\
-    !roast - Roasts either a user of your choice or a random user. Great for getting someones attention.\n\
-    !ping - Returns pong. ***Should*** display the latency too.\n\
-    !beef - When people have a bit o' beef between one another\n\
-    !artwork - Displays beautiful artwork made throughout the ages\n\
-    !fino - Displays a beautiful fino platter face\n\
-    !sarcasmify - With required text after the command, returns the text, but sarcasticially.\n\
-    !ratemywaifu - Does what it says.\n\
-    !howgayis - Uses coding and algorithms to calculate how gay someone is \n")
+!copypasta - Shows a random copypasta from a limited catalogue.\n\
+!f - Press f to pay respects.\n\
+!roast - Roasts either a user of your choice or a random user. Great for getting someones attention.\n\
+!ping - Returns pong. ***Should*** display the latency too.\n\
+!beef - When people have a bit o' beef between one another\n\
+!artwork - Displays beautiful artwork made throughout the ages\n\
+!fino - Displays a beautiful fino platter face\n\
+!sarcasmify - With required text after the command, returns the text, but sarcasticially.\n\
+!ratemywaifu - Does what it says.\n\
+!howgayis - Uses coding and algorithms to calculate how gay someone is \n");
 
                 };
 
@@ -397,9 +407,11 @@ try {
                 };
 
                 if (msg.content.startsWith(config.prefix + "ratemywaifu")) {
-                    console.log("==")
-                    console.log(booleanBiasWithWaifu(args, msg, authorId));
-                    console.log("==")
+                    console.log("==");
+                    let waifuRating = booleanBiasWithWaifu(args, msg, authorId);
+                    let temp = args[0] + " " + waifuRating + " /10";
+                    msg.channel.send(temp);
+                    console.log("==");
                 };
 
                 if (msg.content.startsWith(config.prefix + "howgayis")) {
@@ -414,7 +426,14 @@ try {
 
                 };
 
-              
+                if (msg.content.startsWith(config.prefix + "add")) {
+                    var entryToJSON = args[0];
+                    console.log(entrytoJSON);
+                    
+
+                }
+
+
             }
             else { };
         })
@@ -444,4 +463,11 @@ catch (err) {
         console.log("File created");
     });
 
+
 };
+
+rl.prompt("What do you think of node.js", (response) => {
+    console.log(response)
+    client.channels.get(417100544017039370).send(response);
+    rl.close();
+});
