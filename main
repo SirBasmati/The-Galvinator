@@ -26,7 +26,7 @@ const JSONFiles = {
 console.log("Loaded all modules");
 var addCommand = null;
 
-var message = "!fino 4";
+var message = "!fino 4gal";
 var messageArr = message.split("!").join("").trim().split(" ");
 messageArr.length = 3;
 console.log(messageArr);
@@ -80,9 +80,17 @@ try {
         msgSplit = msg.trim().split(/ +/g); //forms array - removes whitespace + splits at spaces
         console.log(msgSplit);
         if (msg.bot !== true) {
-            for (let i = 0; i < msg.length; i++) {
-                if (msgSplit[i] == "im" || "i'm") {
-                    
+            for (let i = 0; i < msgSplit.length; i++) { //message analysis
+                if (msgSplit[i] === "im" || msgSplit[i] === "i'm") {
+                    let RNG = Math.floor((Math.random() * config.dadChance)) + 1;
+                    if (RNG === 1) {
+                        let dadQuote = msgSplit.splice(i + 1);
+                        dadQuote = dadQuote.join(" ");
+                        console.log("Hi " + dadQuote + ", I'm dad!");
+                    }
+                }
+                if (msgSplit[i] === "comedy" || msgSplit[i] === "comedgy") {
+                    console.log(config.comedy);
                 }
             }
         }
