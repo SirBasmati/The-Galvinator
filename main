@@ -88,8 +88,8 @@ function JSONManipulation(messageArr) {
             //console.log(JSONManipulation(msg));
         }
 
-        client.login(config.token);
     });
+    client.login(config.token);
 }
 
 catch (err) {
