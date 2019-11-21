@@ -26,14 +26,7 @@ const JSONFiles = {
 console.log("Loaded all modules");
 var addCommand = null;
 
-var message = "!fino 4gal";
-var messageArr = message.split("!").join("").trim().split(" ");
-messageArr.length = 3;
-console.log(messageArr);
-
-
 function JSONManipulation(messageArr) {
-    var JSONData = [];
 
     if (messageArr[0] === "add") {
         addCommand = messageArr.shift();
@@ -43,13 +36,7 @@ function JSONManipulation(messageArr) {
 
     let parsedJSON = JSON.parse(fs.readFileSync(JSONFiles[messageArr[0]]));
     let JSONLength = Object.keys(parsedJSON).length;
-    console.log(JSONLength);
-
-    console.log("===");
-    console.log(parsedJSON);
-    console.log(JSONLength);
-    console.log("===");
-
+    
     if (addCommand === null) {
         if (typeof messageArr[1] === "undefined" || parseInt(messageArr[1]) > JSONLength || isNaN(messageArr[1]) === true) { 
             if (parseInt(messageArr[1]) > JSONLength || messageArr !== true) { //overwrites old number and replaces it with a number within the jsons reach, these check to make sure we do that
@@ -68,11 +55,12 @@ function JSONManipulation(messageArr) {
     }
 }
 
-try {
+
+    console.log("Logging in")
     client.on("ready", () => {
         console.log(`Logged in as ${client.user.tag}`);
         client.user.setPresence({ game: { name: "fortnite" }, status: "online" });
-    })
+    });
 
     client.on("message", msg => {
         msg = msg.content;
@@ -82,7 +70,7 @@ try {
         if (msg.bot !== true) {
             for (let i = 0; i < msgSplit.length; i++) { //message analysis
                 if (msgSplit[i] === "im" || msgSplit[i] === "i'm") {
-                    let RNG = Math.floor((Math.random() * config.dadChance)) + 1;
+                    let RNG = Math.floor(Math.random() * config.dadChance) + 1;
                     if (RNG === 1) {
                         let dadQuote = msgSplit.splice(i + 1);
                         dadQuote = dadQuote.join(" ");
@@ -94,9 +82,14 @@ try {
                 }
             }
         }
-    });
 
-    client.login(config.token);
+        if (msg.startsWith(config.prefix + "add") || msg.startsWith(config.prefix + "discordmeme")) {
+            console.log("Adding to database");
+            //console.log(JSONManipulation(msg));
+        }
+
+        client.login(config.token);
+    });
 }
 
 catch (err) {
@@ -104,6 +97,5 @@ catch (err) {
 }
 
 
-console.log(JSONManipulation(messageArr));
 
 
