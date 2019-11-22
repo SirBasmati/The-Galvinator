@@ -9,12 +9,13 @@ const path = require("path");
 const directory = path.dirname(require.main.filename);
 console.log(directory);
 require("dotenv").config();
+console.log(config.prefix);
 
 
 const JSONFiles = {
     "artwork": directory + "/JSON/artwork.json",
     "brainlet": directory + "/JSON/brainlet.json",
-    "copypasta": directory + "/JSON/copypasta.json",
+    "copypasta": directory +  "/JSON/copypasta.json",
     "discordmeme": directory + "/JSON/discord memes.json",
     "eightball": directory + "/JSON/eightball.json",
     "fino": directory + "/JSON/fino.json",
@@ -23,26 +24,39 @@ const JSONFiles = {
 };
 
 
-console.log("Loaded all modules");
-var addCommand = null;
+function JSONManipulation(messageArr, msg) {
+    let addCommand = null;
+    console.log("===");
+    console.log(messageArr);
+    console.log(messageArr[0]);
+    console.log("===");
 
-function JSONManipulation(messageArr) {
+    messageArr[0] = messageArr[0].replace("!", "");
+    console.log(messageArr);
+    
 
     if (messageArr[0] === "add") {
         addCommand = messageArr.shift();
+        console.log("--")
         console.log(addCommand);
         console.log(messageArr);
     }
 
-    let parsedJSON = JSON.parse(fs.readFileSync(JSONFiles[messageArr[0]]));
+    try {
+        var parsedJSON = JSON.parse(fs.readFileSync(JSONFiles[messageArr[0]]));
+    }
+
+    catch (err) {
+        return console.log("invalid command - " + err);
+    }
+
     let JSONLength = Object.keys(parsedJSON).length;
-    
+
+
     if (addCommand === null) {
-        if (typeof messageArr[1] === "undefined" || parseInt(messageArr[1]) > JSONLength || isNaN(messageArr[1]) === true) { 
-            if (parseInt(messageArr[1]) > JSONLength || messageArr !== true) { //overwrites old number and replaces it with a number within the jsons reach, these check to make sure we do that
-                messageArr.pop();
-            }
-            messageArr.push(Math.floor(Math.random() * JSONLength) + 1);
+        if (typeof messageArr[1] === "undefined" || parseInt(messageArr[1]) > JSONLength || isNaN(messageArr[1]) === true || messageArr[1] === null) {//overwrites old number and replaces it with a number within the jsons reach, these check to make sure we do that
+            console.log("reassigning messagearr[1]");
+            messageArr[1] = (Math.floor(Math.random() * JSONLength) + 1);
         }
         console.log(messageArr[1]);
         let JSONOutput = parsedJSON[messageArr[1]];
@@ -50,23 +64,29 @@ function JSONManipulation(messageArr) {
     }
     else if (addCommand !== null) {
         parsedJSON[JSONLength + 1] = messageArr[1];
+        console.log(JSONLength);
         fs.writeFileSync(JSONFiles[messageArr[0]], JSON.stringify(parsedJSON, null, 2));
-        return "Link appended to file";
+        if (config.updateChannel === true) {
+            console.log("Finding channel");
+            console.log(msg.guild.channels.find(channel => channel.name === "#discord-memes"));
+        }
+        return "Link appended to file at file " + JSONFiles[messageArr[0]] + " at value " + (JSONLength + 1);
     }
 }
 
 
-    console.log("Logging in")
+console.log("Loaded all modules");
+try {
     client.on("ready", () => {
         console.log(`Logged in as ${client.user.tag}`);
         client.user.setPresence({ game: { name: "fortnite" }, status: "online" });
-    });
+    })
 
     client.on("message", msg => {
         msg = msg.content;
         msg = msg.toLowerCase();
         msgSplit = msg.trim().split(/ +/g); //forms array - removes whitespace + splits at spaces
-        console.log(msgSplit);
+        msgSplit.length = 3
         if (msg.bot !== true) {
             for (let i = 0; i < msgSplit.length; i++) { //message analysis
                 if (msgSplit[i] === "im" || msgSplit[i] === "i'm") {
@@ -84,18 +104,18 @@ function JSONManipulation(messageArr) {
         }
 
         if (msg.startsWith(config.prefix + "add") || msg.startsWith(config.prefix + "discordmeme")) {
-            console.log("Adding to database");
-            //console.log(JSONManipulation(msg));
+            console.log("gamer time ");
+            console.log(JSONManipulation(msgSplit));
         }
 
-    });
+    })
     client.login(config.token);
 }
+
 
 catch (err) {
     console.log(err);
 }
-
 
 
 
