@@ -1,9 +1,13 @@
 {
-	"token": "null",
-	"prefix": "!",
-	"CLIENT_ID": "null",
-	"CLIENT_SECRET": "null",
-	"REDDIT_PASS": "null",
-	"REDDIT_USER": "null",
-	"debug": true
+  "discordToken": "null",
+  "bitlyID": "null",
+  "bitlySecret": "null",
+  "prefix": "!",
+  "CLIENT_ID": "null",
+  "CLIENT_SECRET": "null",
+  "REDDIT_PASS": "null",
+  "REDDIT_USER": "null",
+  "debug": true,
+  "dadChance": 1,
+  "updateChannel": true
 }
