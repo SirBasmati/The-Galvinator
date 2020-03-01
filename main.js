@@ -46,6 +46,7 @@ function JSONManipulation(messageArr, exclusion) {
     }
 
     try {
+        messageArr[1] = parseInt(messageArr[1], 10);
         var parsedJSON = JSON.parse(fs.readFileSync(JSONFiles[messageArr[0]]));
     }
 
