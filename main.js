@@ -29,6 +29,18 @@ const bitly = new bitlyAPI({
     clientSecret: config.bitlySecret
 });
 
+function waifu(message, guild) {
+    message.shift();
+    if (message[0] === "add") {
+
+    } else if (message[0] === "remove") {
+
+    } else if (message[0] === "rate") {
+
+    }
+
+}
+
 function sarcasm(message) {
     message.shift();
     message = message.join(" ").split("")
@@ -47,38 +59,38 @@ function JSONManipulation(messageArr, exclusion) {
 
     if (messageArr[0] === "add") {
         addCommand = messageArr.shift();
+    }
 
-        try {
-            var parsedJSON = JSON.parse(fs.readFileSync(JSONFiles[messageArr[0]]));
+    try {
+        var parsedJSON = JSON.parse(fs.readFileSync(JSONFiles[messageArr[0]]));
+    }
+
+    catch (err) {
+        return console.log("invalid command - " + err);
+    }
+
+    let JSONLength = Object.keys(parsedJSON).length;
+
+
+    if (addCommand === null) {
+        if (typeof messageArr[1] === "undefined" || parseInt(messageArr[1]) > JSONLength || isNaN(messageArr[1]) === true || messageArr[1] === null || exclusion === true) {//overwrites old number and replaces it with a number within the jsons reach, these check to make sure we do that
+            messageArr[1] = Math.floor(Math.random() * JSONLength) + 1;
         }
-
-        catch (err) {
-            return console.log("invalid command - " + err);
+        console.log(messageArr[1]);
+        let JSONOutput = parsedJSON[messageArr[1]];
+        return JSONOutput;
+    }
+    else if (addCommand !== null && exclusion === false) { //append new link to file
+        link = messageArr[1];
+        console.log(link);
+        parsedJSON[JSONLength + 1] = messageArr[1];
+        console.log(JSONLength);
+        fs.writeFileSync(JSONFiles[messageArr[0]], JSON.stringify(parsedJSON, link, 2));
+        if (config.updateChannel === true) {
+            console.log("Finding channel");
+            //console.log(msg.guild.channels.find(channel => channel.name === "#discord-memes"));
         }
-
-        let JSONLength = Object.keys(parsedJSON).length;
-
-
-        if (addCommand === null) {
-            if (typeof messageArr[1] === "undefined" || parseInt(messageArr[1]) > JSONLength || isNaN(messageArr[1]) === true || messageArr[1] === null || exclusion === true) {//overwrites old number and replaces it with a number within the jsons reach, these check to make sure we do that
-                messageArr[1] = Math.floor(Math.random() * JSONLength) + 1;
-            }
-            console.log(messageArr[1]);
-            let JSONOutput = parsedJSON[messageArr[1]];
-            return JSONOutput;
-        }
-        else if (addCommand !== null && exclusion === false) { //append new link to file
-            link = messageArr[1];
-            console.log(link);
-            parsedJSON[JSONLength + 1] = messageArr[1];
-            console.log(JSONLength);
-            fs.writeFileSync(JSONFiles[messageArr[0]], JSON.stringify(parsedJSON, link, 2));
-            if (config.updateChannel === true) {
-                console.log("Finding channel");
-                //console.log(msg.guild.channels.find(channel => channel.name === "#discord-memes"));
-            }
-            return "Link assigned to No. " + (JSONLength + 1);
-        }
+        return "Link assigned to No. " + (JSONLength + 1);
     }
 }
 
