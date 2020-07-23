@@ -4,41 +4,14 @@ const fs = require("fs");
 const bitlyAPI = require("node-bitlyapi");
 const config = require("./JSON/config/config.json");
 const path = require("path");
+const mkdirp = require("mkdirp");
 const directory = path.dirname(require.main.filename);
-console.log(directory);
 require("dotenv").config();
-console.log(config.prefix);
-
-
-const JSONFiles = {
-    "artwork": directory + "/JSON/artwork.json",
-    "brainlet": directory + "/JSON/brainlet.json",
-    "copypasta": directory + "/JSON/copypasta.json",
-    "discordmeme": directory + "/JSON/discord memes.json",
-    "eightball": directory + "/JSON/eightball.json",
-    "fino": directory + "/JSON/fino.json",
-    "roast": directory + "/JSON/roasts.json"
-};
+console.log("Loaded all required modules");
+var workingDirectory = directory + "/data/guilds/";
 
 function randomInt(max) {
     return Math.floor(Math.random() * Math.floor(max));
-}
-
-const bitly = new bitlyAPI({
-    clientID: config.bitlyID,
-    clientSecret: config.bitlySecret
-});
-
-function waifu(message, guild) {
-    message.shift();
-    if (message[0] === "add") {
-
-    } else if (message[0] === "remove") {
-
-    } else if (message[0] === "rate") {
-
-    }
-
 }
 
 function sarcasm(message) {
@@ -53,38 +26,24 @@ function sarcasm(message) {
     return message.join("");
 }
 
-function JSONManipulation(messageArr, exclusion) {
-    messageArr[0] = messageArr[0].replace("!", "");
-    let addCommand = null;
-
-    if (messageArr[0] === "add") {
-        addCommand = messageArr.shift();
-    }
+function JSONManipulation(contentArgs) {
+    contentArgs[0] == messageArr[0].replace("!", "");
 
     try {
-        var parsedJSON = JSON.parse(fs.readFileSync(JSONFiles[messageArr[0]]));
+        var json = JSON.parse(fs.readFileSync(contentArgs[0]));
+    } catch (err) {
+        return "Invalid Command."
     }
-
-    catch (err) {
-        return console.log("invalid command - " + err);
-    }
-
-    let JSONLength = Object.keys(parsedJSON).length;
-
-
-    if (addCommand === null) {
-        if (typeof messageArr[1] === "undefined" || parseInt(messageArr[1]) > JSONLength || isNaN(messageArr[1]) === true || messageArr[1] === null || exclusion === true) {//overwrites old number and replaces it with a number within the jsons reach, these check to make sure we do that
+    let length = Object.keys(json).length
+    if (contentArgs[1] !== "add") {
+        if (typeof contentArgs[1] === "undefined" || parseInt(mescontentArgssageArr[1]) > JSONLength || isNaN(contentArgs[1]) === true || contentArgs[1] === null) {
             messageArr[1] = Math.floor(Math.random() * JSONLength) + 1;
         }
-        console.log(messageArr[1]);
         let JSONOutput = parsedJSON[messageArr[1]];
         return JSONOutput;
-    }
-    else if (addCommand !== null && exclusion === false) { //append new link to file
+    } else if (contentArgs[1] === "add") {
         link = messageArr[1];
-        console.log(link);
         parsedJSON[JSONLength + 1] = messageArr[1];
-        console.log(JSONLength);
         fs.writeFileSync(JSONFiles[messageArr[0]], JSON.stringify(parsedJSON, link, 2));
         if (config.updateChannel === true) {
             console.log("Finding channel");
@@ -95,91 +54,71 @@ function JSONManipulation(messageArr, exclusion) {
 }
 
 
-console.log("Loaded all modules");
+function dadMode (content){
+    for (let i = 0; i < content.length; i++) { 
+        if (content[i] === "im" || content[i] === "i'm") {
+            RNG = randomInt(config.dadChance);
+            if (RNG === 1) {
+                let dadQuote = msgSplit.splice(i + 1);
+                dadQuote = dadQuote.join(" ");
+                return dadQuote;
+            }
+        }
+    }
+}
+
 try {
     client.on("ready", () => {
         console.log(`Logged in as ${client.user.tag}`);
-        client.user.setPresence({ game: { name: "fortnite" }, status: "online" });
+        client.user.setPresence({ game: { name: config.status }, status: "online"});
+    });
+    client.on("guildCreate", () => {
+        console.log(`Joined ${guild.name}`);
+        let guildDir = workingDirectory + guild.id;
+        mkdirp(guildDir).then(made =>
+            jsonDir = guildDir + "/commands.json",
+            fs.writeFile(jsonDir, "{}", { flag: "wx" }, function (err) {
+                console.log("Commands JSON Created");
+            }),
+        )
+        guild.roles.create({
+            data: {
+                name: "The Galvinator",
+                permissions: "ADMINISTRATOR"
+            },
+            reason: "The Galvinator needs his own role."
+        })
+        guild.roles.create({
+            data: {
+                name: "The Overlord",
+            },
+            reason: "The Galvinator needs to knows who he can interact with."
+        })
     });
     client.on("message", message => {
-        var msg = message.content;
+        var content = message.content;
+        var contentArgs = content.split(" ");
         var authorID = message.author.id;
-        if (authorID !== 451895471305392138) {
-            msg = msg.toLowerCase();
-            msgSplit = msg.trim().split(/ +/g); //forms array - removes whitespace + splits at spaces
-            msgSplit.length = 3;
-            if (msg.bot !== true) {
-                for (let i = 0; i < msgSplit.length; i++) { //message analysis
-                    if (msgSplit[i] === "im" || msgSplit[i] === "i'm") {
-                        let RNG = Math.floor(Math.random() * config.dadChance) + 1;
-                        if (RNG === 1) {
-                            let dadQuote = msgSplit.splice(i + 1);
-                            dadQuote = dadQuote.join(" ");
-                            console.log("Hi " + dadQuote + ", I'm dad!");
-                        }
-                    }
-                    if (msgSplit[i] === "comedy" || msgSplit[i] === "comedgy") {
-                        console.log(config.comedy);
+        var guildID = message.guild.id;
+        if (message.bot !== true) {
+            content = content.toLowerCase();
+            if (config.dadMode === true) {
+                message.channel.send(dadMode(contentArgs));
+            } 
+            if (config.commandMode === true) {
+                let json = JSON.parse(fs.readFileSync(JSONFiles[messageArr[0]])); //TODO Cache the results;
+                for (let i = 0; i < Object.keys(json).length; i++) {
+                    if (content.startsWith(config.prefix + json[i])) {
+                        JSONManipulation(json[i]);
                     }
                 }
             }
-            let guild = message.guild;
-
-            if (msg.startsWith(config.prefix + "add") || msg.startsWith(config.prefix + "discordmeme") || msg.startsWith(config.prefix + "artwork")) {
-                message.channel.send(JSONManipulation(message.content.trim().split(/ +/g), false));
-            }
-            else if (msg.startsWith(config.prefix + "fino") || msg.startsWith(config.prefix + "roast")) {
-                if (msg.startsWith(config.prefix + "roast")) {
-                    console.log("Attempting to find a random ID");
-                    var memberID = guild.members.randomKey();
-                    console.log(memberID);
-                    memberID = "<@" + memberID + ">";
+            if (config.createCommands === true) {
+                if (message.member.roles.has(message.guild.roles.find(role => role.name === "The Overlord"))){
+                    JSONManipulation(contentArgs);
                 }
-                else {
-                    memberID = null;
-                }
-                message.channel.send(JSONManipulation(message.content.trim().split(/ +/g), true) + memberID);
-
             }
-
-            if (msg.startsWith(config.prefix + "help")) {
-                message.channel.send(`Commands available:
-!discordmeme - Shows a random meme that has been made over the ages. 
-!copypasta - Shows a random copypasta from a limited catalogue. (DEPRICATED)
-!f - Press f to pay respects. 
-!x - Press x to doubt.
-!roast - Roasts either a user of your choice or a random user.Great for getting someones attention.
-!ping - Returns pong.Should display the latency too. (DEPRICATED)
-!beef - When people have a bit o' beef between one another
-!artwork - Displays beautiful artwork made throughout the ages
-!fino - Displays a beautiful fino platter face
-!s - With required text after the command, returns the text, but sarcasticially. 
-!ratemywaifu - Does what it says. (DEPRICATED)
-!howgayis - Uses coding and algorithms to calculate how gay someone is. (DEPRICATED)`)
-            }
-            if (msg.startsWith(config.prefix + "f")) {
-                message.channel.send("https://i.kym-cdn.com/entries/icons/original/000/017/039/pressf.jpg")
-            }
-            if (msg.startsWith(config.prefix + "x")) {
-                message.channel.send("https://i.kym-cdn.com/photos/images/original/001/354/591/17c.png")
-            }
-            if (msg.startsWith(config.prefix + "beef")) {
-                message.channel.send("https://cdn.discordapp.com/attachments/417100544017039370/432599310824112138/beef.png")
-            }
-
-            if (msg.startsWith(config.prefix + "s")) {
-                message.channel.send(sarcasm(message.content.trim().split(/ +/g)));
-            };
-
-            if (msg.startsWith(config.prefix + "waifu")) {
-                message.channel.send()
-            }
-        };
+        }
     });
-    client.login(config.discordToken);
-}
 
-
-catch (err) {
-    console.log(err);
 }
